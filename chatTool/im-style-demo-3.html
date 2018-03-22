@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Page Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" media="screen" href="./main.css" />
+  <script src="./main.js"></script>
+</head>
+
+<body onkeydown="keyListener(event)">
+  <div class="container-fluid full-height">
+    <div class="row full-height">
+      <div class="col-xs-6 left full-height">
+        <button type="submit" class="btn btn-info button" id="btn_submit" onclick="btnAction()">复制到微信(手动ctrl+c也可)</button>
+        <h3 id='name1'></h3>
+
+        <form class="form-inline inline" style="margin-bottom: 10px;">
+          <div class="form-group">
+            <label class="sr-only" for="newName">新昵称</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="newName" placeholder="请输入新昵称">
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary button" onclick="reName()">提交</button>
+        </form>
+
+        <form class="form-inline inline" style="margin-bottom: 10px;">
+          <div class="form-group">
+            <label class="sr-only" for="newImage">新头像</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="newImage" placeholder="请输入新头像地址">
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary button" onclick="reImage()">提交</button>
+        </form>
+
+        <div class="row">
+          <form id="textareaDem1" action="#" method="post">
+            <div class="col-xs-8">
+              <textarea id="text1" class="form-control" rows="6" placeholder="Enter 换行，Ctrl + Enter 提交" onkeydown="keyListener2(event)"></textarea>
+            </div>
+            <div class="col-xs-4">
+              <button type="button" class="btn btn-info button" onclick="sendText(1)" style="margin-bottom: 5px;">文本</button>
+              <br />
+              <button type="button" class="btn btn-info button" onclick="sendImg(1)">图片</button>
+            </div>
+          </form>
+        </div>
+        <hr>
+        <h3 id='name2'></h3>
+
+        <form class="form-inline inline" style="margin-bottom: 10px;">
+          <div class="form-group">
+            <label class="sr-only" for="newName2">新昵称</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="newName2" placeholder="请输入新昵称">
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary button" onclick="reName2()">提交</button>
+        </form>
+
+        <form class="form-inline inline" style="margin-bottom: 10px;">
+          <div class="form-group">
+            <label class="sr-only" for="newImage2">新头像</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="newImage2" placeholder="请输入新头像地址">
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary button" onclick="reImage2()">提交</button>
+        </form>
+
+        <div class="row">
+          <form id="textareaDem2" action="#" method="post">
+            <div class="col-xs-8">
+              <textarea id="text2" class="form-control" rows="6" placeholder="Enter 换行，Ctrl + Enter 提交" onkeydown="keyListener3(event)"></textarea>
+            </div>
+            <div class="col-xs-4">
+              <button type="button" class="btn btn-info button" onclick="sendText(2)" style="margin-bottom: 5px;">文本</button>
+              <br />
+              <button type="button" class="btn btn-info button" onclick="sendImg(2)">图片</button>
+            </div>
+          </form>
+        </div>
+        <hr>
+
+      </div>
+      <div class="col-xs-6 right full-height">
+        <section id="target" class="demo">
+          <!-- 聊天区域 -->
+        </section>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  let lastSpeakerId;
+  let count = 0;
+  let name1 = '红小兵';
+  let name2 = '兵小红';
+  let image1 =
+    `http://mmbiz.qpic.cn/mmbiz_png/jFfUbqak7PTiaZ6SEWQib1KIsDNUnqp8r6vElwibqVWxfJnwYu3icJqbJfiajHxeTHc8l8H4tfvBCaI7OM4NDG8ws8A/0?wx_fmt=png`;
+  let image2 =
+    'http://mmbiz.qpic.cn/mmbiz_png/6ias4WNGRIJl3NKqzCVG5l1FNyicFfibNS8wcIMIxR5r9uMJukmm8zEW0ySoQl9PT6kZLiasdic9b864WVkwxiaNYI1g/0?wx_fmt=png';
+  document.getElementById("name1").innerHTML = name1;
+  document.getElementById("name2").innerHTML = name2;
+
+
+  const btnAction = function () {
+    let text = document.getElementById('target');
+    let selection = window.getSelection();
+    let range = document.createRange();
+    range.selectNode(text);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    // text.select(); // 选择对象
+    document.execCommand('Copy'); // 执行浏览器复制命令
+    selection.removeAllRanges();
+    alert('已复制好，可贴粘。');
+  }
+
+  const sendText = function (speakerId) {
+    let target = 'text' + speakerId;
+    let text = document.getElementById(target).value.replace(/\n|\r\n/g, "<br/>");
+    document.getElementById(target).value = '';
+    document.getElementById(target).focus();
+    if (text === '') return;
+    let html = document.getElementById("target").innerHTML;
+    if (speakerId == lastSpeakerId) {
+      document.getElementById("target").innerHTML = html + injectHtml[speakerId - 1][1][0] + '<p>' + text + '</p>' +
+        injectHtml[speakerId - 1][1][1];
+    } else {
+      document.getElementById("target").innerHTML = html + injectHtml[speakerId - 1][0][0] + '<p>' + text + '</p>' +
+        injectHtml[speakerId - 1][0][1];
+      lastSpeakerId = speakerId;
+    }
+    count++;
+  }
+
+  const sendImg = function (speakerId) {
+    let target = 'text' + speakerId;
+    let el;
+    let text = document.getElementById(target).value;
+    document.getElementById(target).value = '';
+    document.getElementById(target).focus();
+    if (text === '') return;
+    if (checkImgExists(text)) {
+      el = '<img src="' + text + '" />';
+    } else {
+      el = '<p>' + text + '</p>';
+    }
+    let html = document.getElementById("target").innerHTML;
+    if (speakerId == lastSpeakerId) {
+      document.getElementById("target").innerHTML = html + injectHtml[speakerId - 1][1][0] + el + injectHtml[
+        speakerId - 1][1][1];
+    } else {
+      document.getElementById("target").innerHTML = html + injectHtml[speakerId - 1][0][0] + el + injectHtml[
+        speakerId - 1][0][1];
+      lastSpeakerId = speakerId;
+    }
+    count++;
+  }
+
+  const reName = function () {
+    let text = document.getElementById('newName').value;
+    document.getElementById('newName').value = '';
+    document.getElementById('newName').focus();
+    if (text === '' || text == name1) return;
+    if (text == name2) {
+      alert('该昵称已被使用');
+      return;
+    }
+    let reg = '/' + name1 + '/g';
+    document.getElementById("name1").innerHTML = text;
+    let html = document.getElementById("target").innerHTML.replace(eval(reg), text);
+    document.getElementById("target").innerHTML = html;
+    injectHtml[0][0][0] = injectHtml[0][0][0].replace(eval(reg), text);
+    name1 = text;
+  }
+
+  const reName2 = function () {
+    console.log('111');
+    let text = document.getElementById('newName2').value;
+    document.getElementById('newName2').value = '';
+    document.getElementById('newName2').focus();
+    if (text === '' || text == name2) return;
+    if (text == name1) {
+      alert('该昵称已被使用');
+      return;
+    }
+    let reg = '/' + name2 + '/g';
+    document.getElementById("name2").innerHTML = text;
+    let html = document.getElementById("target").innerHTML.replace(eval(reg), text);
+    document.getElementById("target").innerHTML = html;
+    injectHtml[1][0][0] = injectHtml[1][0][0].replace(eval(reg), text);
+    name2 = text;
+  }
+
+  const reImage = function () {
+    console.log('111');
+    let text = document.getElementById('newImage').value;
+    document.getElementById('newImage').value = '';
+    document.getElementById('newImage').focus();
+    if (text === '' || text == image1) return;
+
+    // let reg = `/` + image1 + `/g`;
+    // let reg = new RegExp(image1, 'g');
+    // console.log(reg);
+    let html = document.getElementById("target").innerHTML;
+    for (i = 0; i < count; i++) {
+      html = html.replace(image1, text);
+    }
+    document.getElementById("target").innerHTML = html;
+
+    // let html = document.getElementById("target").innerHTML.replace(eval(reg), text);
+    // document.getElementById("target").innerHTML = html;
+
+    injectHtml[0][0][0] = injectHtml[0][0][0].replace(image1, text);
+    image1 = text;
+  }
+
+  const reImage2 = function () {
+    console.log('111');
+    let text = document.getElementById('newImage2').value;
+    document.getElementById('newImage2').value = '';
+    document.getElementById('newImage2').focus();
+    if (text === '' || text == image2) return;
+
+    // let reg = `/` + image1 + `/g`;
+    // let reg = new RegExp(image1, 'g');
+    // console.log(reg);
+    let html = document.getElementById("target").innerHTML;
+    for (i = 0; i < count; i++) {
+      html = html.replace(image2, text);
+    }
+    document.getElementById("target").innerHTML = html;
+
+    // let html = document.getElementById("target").innerHTML.replace(eval(reg), text);
+    // document.getElementById("target").innerHTML = html;
+
+    injectHtml[1][0][0] = injectHtml[1][0][0].replace(image2, text);
+    image2 = text;
+  }
+
+  const keyListener = function (event) {
+    if (event.ctrlKey && event.keyCode === 67) {
+      btnAction();
+    }
+  }
+
+  const keyListener2 = function (event) {
+    if (event.ctrlKey && event.keyCode === 13) {
+      sendImg(1);
+    }
+  }
+
+  const keyListener3 = function (event) {
+    if (event.ctrlKey && event.keyCode === 13) {
+      sendImg(2);
+    }
+  }
+</script>
+
+</html>
